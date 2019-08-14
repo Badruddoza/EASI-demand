@@ -1,0 +1,39 @@
+library("easi")
+data(hixdata)
+# Budget shares Matrix 
+shares_HIX=hixdata[,2:10]
+# price Matrix (in logarithms) 
+log.price_HIX=hixdata[,11:19]
+# demographic matrix 
+var.soc_HIX=hixdata[,21:25]
+# logarithm of total expenditure 
+# divised by a price index 
+log.exp_HIX=hixdata[,20]
+
+# estimation 
+est <- easi(shares=shares_HIX,log.price=log.price_HIX,
+var.soc=var.soc_HIX,log.exp=log.exp_HIX)
+# local concavity
+concavity(est)
+# Retrieve Estimates
+coef(est)
+summary(est)
+head(predict(est))
+head(residuals(est))
+dim(vcov(est))
+
+# Changes in prices 
+# PRIX.HIX --> PRIX.HIX.SIM1 = 0
+log.price_HIX.SIM1 <- log.price_HIX
+for (i in 1:ncol(log.price_HIX))
+  log.price_HIX.SIM1[,i] <- 0
+# Changes in demographic variables 
+# var.soc.HIX --> var.soc.HIX.SIM1 = 0 
+  var.soc_HIX.SIM1 <- var.soc_HIX
+ for (i in 1:ncol(var.soc_HIX))
+  var.soc_HIX.SIM1[,i] <- 0
+# simulation 
+sim <- simulations(est,log.price_new=log.price_HIX.SIM1,
+var.soc_new=var.soc_HIX.SIM1,log.exp_new=log.exp_HIX)
+# corresponding Engel curves 
+eng2 <- engel(sim,file="essai2",sd=FALSE)
